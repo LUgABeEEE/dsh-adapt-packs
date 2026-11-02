@@ -806,14 +806,31 @@ const FIXTURE = (optOut) => `<!DOCTYPE html>
     border-radius: 8px; background: #16171b; color: inherit; font: inherit; }
   .dshm-drawer { position: fixed; inset: 0 auto 0 0; width: 56px; background: #1a1c22;
     padding-top: env(safe-area-inset-top); overflow: hidden; }
-  .dshm-drawer .rail { width: 56px; height: 100%; display: grid; place-items: start center; padding-top: 12px; }
-  /* The drawer is a 56px rail when collapsed and a 280px overlay when open; the
-     shell's own sidebar rows are desktop-density until a pack raises the floor. */
+  .dshm-drawer .rail { width: 56px; height: 100%; display: grid; place-items: start center;
+    gap: 4px; padding-top: 12px; }
+  /* The drawer is a 56px icon rail when collapsed and a 280px overlay when open; the
+     shell's own sidebar rows are desktop-density until a pack raises the floor.
+     Both states matter: the rail's icon buttons and the docked session/project rows
+     (role="treeitem") are separate touch surfaces. */
   .dshm-drawer[data-open="true"] { width: 280px; }
   .dshm-drawer[data-open="true"] .rail { display: none; }
+  .dshm-drawer:not([data-open="true"]) .rows { display: none; }
   .dshm-drawer [data-slot="sidebar"] { display: flex; flex-direction: column; gap: 4px; padding: 12px 8px; }
+  .dshm-drawer .rows { display: flex; flex-direction: column; gap: 4px; }
+  .rail-icon { display: inline-flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; padding: 0; border: 0; border-radius: 8px;
+    background: transparent; color: #9aa0ab; font: inherit; }
+  /* The drawer's own expand/collapse toggle: t12/t17 measured 28x28 collapsed and
+     36x36 expanded — same width gap as the rail icons. */
+  .drawer-toggle { display: inline-flex; align-items: center; justify-content: center;
+    width: 28px; height: 28px; padding: 0; border: 0; border-radius: 6px;
+    background: #262933; color: inherit; font: inherit; }
+  .dshm-drawer[data-open="true"] .drawer-toggle { width: 36px; height: 36px; }
   .rail-btn { min-height: 28px; padding: 0 10px; border: 0; border-radius: 8px;
     background: transparent; color: inherit; font: inherit; text-align: left; }
+  .row-item { display: flex; align-items: center; min-height: 32px; padding: 0 10px;
+    border-radius: 8px; background: #20222a; color: inherit; font: inherit; }
+  .row-item + .row-item { min-height: 34px; }
   /* A fixed widget pinned to the bottom-right corner, like a cost bubble or a
      helper entry point. It sits outside .dshm-shell and is not a panel. */
   .float-widget { position: fixed; right: 8px; bottom: 0; width: 112px; height: 118px;
@@ -839,10 +856,19 @@ const FIXTURE = (optOut) => `<!DOCTYPE html>
       </div>
     </main>
   </div>
-  <aside class="dshm-drawer" data-open="false"><div class="rail">≡</div><div data-slot="sidebar">
-    <button type="button" class="rail-btn">会话</button>
-    <button type="button" class="rail-btn">文件</button>
-    <button type="button" class="rail-btn">设置</button>
+  <aside class="dshm-drawer" data-open="false"><div data-slot="sidebar">
+    <button type="button" class="drawer-toggle" data-fixture="drawer-toggle" aria-label="收起侧边栏">‹</button>
+    <div class="rail" data-fixture="rail">
+      <button type="button" class="rail-icon" aria-label="会话">≡</button>
+      <button type="button" class="rail-icon" aria-label="文件">▤</button>
+    </div>
+    <div class="rows">
+      <button type="button" class="rail-btn">会话</button>
+      <button type="button" class="rail-btn">文件</button>
+      <button type="button" class="rail-btn">设置</button>
+      <div class="row-item" role="treeitem" aria-selected="false" tabindex="0">论文 · 新会话</div>
+      <div class="row-item" role="treeitem" aria-selected="false" tabindex="0">项目 · demo</div>
+    </div>
   </div></aside>
   <div class="float-widget">float widget</div>
 </body></html>`
@@ -948,7 +974,26 @@ function measurePage() {
   const main = document.querySelector('.dshm-main')
   const content = document.querySelector('.dshm-mainContent')
   const contentStyle = content === null ? null : getComputedStyle(content)
-  const sidebarButtons = [...document.querySelectorAll('.dshm-drawer [data-slot="sidebar"] :is(button, [role="button"])')]
+  const sidebarButtons = [...document.querySelectorAll('.dshm-drawer [data-slot="sidebar"] :is(button, [role="button"]):not([data-fixture="drawer-toggle"])')]
+    .filter(visible)
+    .map(element => ({
+      tag: element.tagName.toLowerCase(),
+      text: (element.textContent ?? '').trim().slice(0, 12),
+      ...rect(element),
+    }))
+  // Collapsed icon rail (visible while the drawer is closed) and docked rows
+  // (`role="treeitem"` in the shell's workspace list). They are separate touch
+  // surfaces from the expanded drawer's buttons, so they get their own readings.
+  const railButtons = [...document.querySelectorAll('.dshm-drawer [data-fixture="rail"] :is(button, [role="button"])')]
+    .filter(visible)
+    .map(element => ({
+      tag: element.tagName.toLowerCase(),
+      text: (element.textContent ?? '').trim().slice(0, 12),
+      ...rect(element),
+    }))
+  const drawerToggle = rect(document.querySelector('.dshm-drawer [data-fixture="drawer-toggle"]'))
+  const sidebarTreeitems = [...document.querySelectorAll('.dshm-drawer [data-slot="sidebar"] [role="treeitem"]')]
+    .filter(visible)
     .map(element => ({
       tag: element.tagName.toLowerCase(),
       text: (element.textContent ?? '').trim().slice(0, 12),
@@ -968,6 +1013,9 @@ function measurePage() {
     select: rect(selectNode),
     panelNavButton: rect(document.querySelector('.dshm-panelNav button')),
     sidebarButtons,
+    drawerToggle,
+    railButtons,
+    sidebarTreeitems,
     drawer: rect(document.querySelector('.dshm-drawer')),
     controls,
     panelState: main === null ? null : main.getAttribute('data-dsh-panel'),
@@ -1230,6 +1278,35 @@ function validateBaseline(report, fixture, device, fixtureInfo) {
       failures.push('抽屉展开后没有可测的侧栏按钮')
     } else if (openRows.some(row => row.height > 32)) {
       failures.push(`基线抽屉侧栏按钮高度 ${fmt(openRows[0].height)}，期望桌面优先的 28px`)
+    }
+  }
+  // Shell packs also need the two sidebar surfaces the harness now measures: the
+  // collapsed rail's icon buttons and the docked list's `role="treeitem"` rows. Both
+  // must start below the 44px floor, otherwise the pack would "pass" without lifting
+  // anything.
+  if (covers(report, 'shell-hit-target')) {
+    const rail = metrics.railButtons ?? []
+    const rows = fixture.openMetrics?.sidebarTreeitems ?? []
+    if (rail.length === 0) failures.push('侧栏折叠轨道里没有可测按钮（[data-fixture="rail"] button）')
+    if (rows.length === 0) failures.push('侧栏没有 docked 行（[data-slot="sidebar"] [role="treeitem"]）')
+    if (rail.some(button => button.height >= HIT_TARGET - EPSILON)) {
+      failures.push(`侧栏轨道按钮基线高度 ${fmt(rail[0].height)}，期望 < ${HIT_TARGET}px`)
+    }
+    if (rail.some(button => button.width >= HIT_TARGET - EPSILON)) {
+      failures.push(`侧栏轨道按钮基线宽度 ${fmt(rail[0].width)}，期望 < ${HIT_TARGET}px`)
+    }
+    if (rows.some(row => row.height >= HIT_TARGET - EPSILON)) {
+      failures.push(`侧栏 docked 行基线高度 ${fmt(rows[0].height)}，期望 < ${HIT_TARGET}px`)
+    }
+    // The drawer's own toggle is 28x28 collapsed / 36x36 expanded on the device
+    // (t17); both states must start below the floor so the pack has to lift them.
+    const toggle = metrics.drawerToggle
+    const openToggle = fixture.openMetrics?.drawerToggle ?? null
+    if (toggle === null || toggle === undefined || openToggle === null || openToggle === undefined) {
+      failures.push('侧栏没有 drawerToggle（[data-fixture="drawer-toggle"]）')
+    } else if (toggle.width >= HIT_TARGET - EPSILON || toggle.height >= HIT_TARGET - EPSILON
+      || openToggle.width >= HIT_TARGET - EPSILON || openToggle.height >= HIT_TARGET - EPSILON) {
+      failures.push(`drawerToggle 基线 ${fmt(toggle.width)}×${fmt(toggle.height)}（展开 ${fmt(openToggle.width)}×${fmt(openToggle.height)}），期望都 < ${HIT_TARGET}px`)
     }
   }
   for (const failure of failures) report.fail('runtime', `runtime.${device}.fixture`, `${label} fixture 基线不成立：${failure}`)
@@ -1543,6 +1620,56 @@ function checkShellAssertions(report, baseline, after) {
       report.pass(layer, 'runtime.shell.drawer', `抽屉展开后 ${rows.length} 个侧栏按钮高度 ≥ ${HIT_TARGET}px${baseRows.length > 0 ? `（基线 ${fmt(baseRows[0].height)}）` : ''}`)
     }
   }
+
+  // Collapsed icon rail (visible while the drawer is closed): the host floor only
+  // covers the main slot, so these icons are a real gap on both release lines.
+  const rail = after.metrics.railButtons ?? []
+  if (rail.length === 0) {
+    report.fail(layer, 'runtime.shell.rail', 'fixture 里没有折叠轨道按钮（[data-fixture="rail"] button）')
+  } else {
+    const tooSmall = rail.filter(button => button.height < HIT_TARGET - EPSILON || button.width < HIT_TARGET - EPSILON)
+    if (tooSmall.length > 0) {
+      report.fail(layer, 'runtime.shell.rail', `折叠轨道 ${tooSmall.length}/${rail.length} 个图标按钮最小边小于 ${HIT_TARGET}px：${tooSmall.map(button => `${button.text || button.tag} ${button.width}×${button.height}px`).join('、')}`)
+    } else {
+      const baseRail = baseline.metrics.railButtons ?? []
+      if (baseRail.length > 0 && (rail[0].height > baseRail[0].height + 1 || rail[0].width > baseRail[0].width + 1)) changed = true
+      report.pass(layer, 'runtime.shell.rail', `折叠轨道 ${rail.length} 个图标按钮 ${fmt(rail[0].width)}×${fmt(rail[0].height)}（≥ ${HIT_TARGET}px）${baseRail.length > 0 ? `，基线 ${fmt(baseRail[0].width)}×${fmt(baseRail[0].height)}` : ''}`)
+    }
+  }
+
+  // The drawer's own expand/collapse toggle: measured in both states (28x28 collapsed,
+  // 36x36 expanded on the device). Width matters as much as height (t15 F1).
+  const toggle = after.metrics.drawerToggle
+  const openToggle = open === null || open === undefined ? null : open.drawerToggle
+  if (toggle === null || toggle === undefined || openToggle === null || openToggle === undefined) {
+    report.fail(layer, 'runtime.shell.drawerToggle', 'fixture 里没有 drawerToggle（[data-fixture="drawer-toggle"]）')
+  } else if (toggle.width < HIT_TARGET - EPSILON || toggle.height < HIT_TARGET - EPSILON
+    || openToggle.width < HIT_TARGET - EPSILON || openToggle.height < HIT_TARGET - EPSILON) {
+    report.fail(layer, 'runtime.shell.drawerToggle', `drawerToggle ${fmt(toggle.width)}×${fmt(toggle.height)}（展开 ${fmt(openToggle.width)}×${fmt(openToggle.height)}），最小边小于 ${HIT_TARGET}px`)
+  } else {
+    const baseToggle = baseline.metrics.drawerToggle
+    const baseOpen = baseline.openMetrics?.drawerToggle
+    if (baseToggle !== null && baseToggle !== undefined && (toggle.width > baseToggle.width + 1 || toggle.height > baseToggle.height + 1)) changed = true
+    if (baseOpen !== null && baseOpen !== undefined && (openToggle.width > baseOpen.width + 1 || openToggle.height > baseOpen.height + 1)) changed = true
+    report.pass(layer, 'runtime.shell.drawerToggle', `drawerToggle 收起 ${fmt(toggle.width)}×${fmt(toggle.height)} / 展开 ${fmt(openToggle.width)}×${fmt(openToggle.height)}（≥ ${HIT_TARGET}px）`)
+  }
+
+  // Docked sidebar rows (`role="treeitem"`, the shell's own workspace list). Same
+  // story: not in the host floor's scope, and the drawer's `data-open` state must not
+  // decide whether they get a floor.
+  const docked = open === null || open === undefined ? [] : open.sidebarTreeitems ?? []
+  if (docked.length === 0) {
+    report.fail(layer, 'runtime.shell.dockedRows', 'fixture 里没有 docked 侧栏行（[data-slot="sidebar"] [role="treeitem"]）')
+  } else {
+    const tooSmall = docked.filter(row => row.height < HIT_TARGET - EPSILON || row.width < HIT_TARGET - EPSILON)
+    if (tooSmall.length > 0) {
+      report.fail(layer, 'runtime.shell.dockedRows', `停靠侧栏 ${tooSmall.length}/${docked.length} 行高度小于 ${HIT_TARGET}px：${tooSmall.map(row => `${row.text} ${row.height}px`).join('、')}`)
+    } else {
+      const baseRows = baseline.openMetrics?.sidebarTreeitems ?? []
+      if (baseRows.length > 0 && docked[0].height > baseRows[0].height + 1) changed = true
+      report.pass(layer, 'runtime.shell.dockedRows', `停靠侧栏 ${docked.length} 行高度 ≥ ${HIT_TARGET}px${baseRows.length > 0 ? `（基线 ${fmt(baseRows[0].height)}）` : ''}`)
+    }
+  }
   return changed
 }
 
@@ -1570,6 +1697,13 @@ function checkOptOut(report, baseline, optOut) {
   // to silence shell rules too — a shell pack that only looks at the panel root
   // would keep patting the thumb while the user asked it to stop.
   compare('返回栏按钮高度', optOut.metrics.panelNavButton?.height, baseline.metrics.panelNavButton?.height)
+  compare('折叠轨道按钮高度', optOut.metrics.railButtons?.[0]?.height, baseline.metrics.railButtons?.[0]?.height)
+  compare('折叠轨道按钮宽度', optOut.metrics.railButtons?.[0]?.width, baseline.metrics.railButtons?.[0]?.width)
+  compare('drawerToggle 收起宽度', optOut.metrics.drawerToggle?.width, baseline.metrics.drawerToggle?.width)
+  compare('drawerToggle 收起高度', optOut.metrics.drawerToggle?.height, baseline.metrics.drawerToggle?.height)
+  compare('drawerToggle 展开宽度', optOut.openMetrics?.drawerToggle?.width, baseline.openMetrics?.drawerToggle?.width)
+  compare('drawerToggle 展开高度', optOut.openMetrics?.drawerToggle?.height, baseline.openMetrics?.drawerToggle?.height)
+  compare('停靠侧栏行高度', optOut.openMetrics?.sidebarTreeitems?.[0]?.height, baseline.openMetrics?.sidebarTreeitems?.[0]?.height)
   compare('面板根 margin-bottom', Number.parseFloat(optOut.metrics.panelMarginBottom ?? '0'), Number.parseFloat(baseline.metrics.panelMarginBottom ?? '0'))
   compare('--dshm-floaters', Number.parseFloat(optOut.metrics.floatersVar || '0') || 0, 0)
   compare('抽屉侧栏按钮高度', optOut.openMetrics?.sidebarButtons?.[0]?.height, baseline.openMetrics?.sidebarButtons?.[0]?.height)
@@ -1600,6 +1734,11 @@ function checkDesktop(report, baseline, after, strict) {
   compare('scrollWidth', after.metrics.scrollWidth, baseline.metrics.scrollWidth)
   compare('返回栏按钮', after.metrics.panelNavButton?.height, baseline.metrics.panelNavButton?.height)
   compare('抽屉侧栏按钮', after.openMetrics?.sidebarButtons?.[0]?.height, baseline.openMetrics?.sidebarButtons?.[0]?.height)
+  compare('折叠轨道按钮高度', after.metrics.railButtons?.[0]?.height, baseline.metrics.railButtons?.[0]?.height)
+  compare('折叠轨道按钮宽度', after.metrics.railButtons?.[0]?.width, baseline.metrics.railButtons?.[0]?.width)
+  compare('drawerToggle 收起', after.metrics.drawerToggle?.width, baseline.metrics.drawerToggle?.width)
+  compare('drawerToggle 展开', after.openMetrics?.drawerToggle?.width, baseline.openMetrics?.drawerToggle?.width)
+  compare('停靠侧栏行', after.openMetrics?.sidebarTreeitems?.[0]?.height, baseline.openMetrics?.sidebarTreeitems?.[0]?.height)
   if (failures.length > 0) {
     report.fail(layer, 'runtime.desktop.zero-change', `1280×800 精指针下适配改动了桌面：${failures.join('；')}`)
   } else {

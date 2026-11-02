@@ -49,7 +49,7 @@ is "adaptation content stays here, the host gets interfaces only".
 | pack | scope | what it does |
 | --- | --- | --- |
 | [`core-panel`](packs/core-panel/) | plugin panels | 44px hit floor inside a panel — the only source on 0.8.x, and a fallback that backs off once the host ships its own floor (#319); icon-only button width; width reclaim |
-| [`shell-chrome`](packs/shell-chrome/) | the shell itself | the open drawer's sidebar rows (36 → 44px); the "back to conversation" bar becomes a rise-only floor that never shrinks the host's own 48px |
+| [`shell-chrome`](packs/shell-chrome/) | the shell itself | both drawer states: docked session/project rows (`role="treeitem"`, 32/34 → 44px), rail icon buttons and the drawer's own toggle (36×36 / 28×28 → 44×44, width included); the "back to conversation" bar becomes a rise-only floor that never shrinks the host's own 48px |
 | [`floaters`](packs/floaters/) | floating widgets | measures bottom-right fixed widgets, reserves their height, so the last rows stop hiding underneath |
 | [`dshmarket-mobile`](packs/dshmarket-mobile/) | the plugin market panel | a 44px touch floor for `dshmarket` 1.73.x: buttons, icon buttons and the search field, scoped to `[data-dsh-market-root]` |
 | [`dsh-context-mobile`](packs/dsh-context-mobile/) | the context/cost panel | a 44px touch floor for `dsh-context` 0.79.x on **dsh-mobile 0.8.x only** (0.8.1+ provides the same floor and the pack backs off): granularity buttons, icon-only clear button, search/select and custom `role=button` rows; located through the plugin's own `data-lc-*` attributes, scoped by this pack's marker |
@@ -157,6 +157,8 @@ The contract — allowed markup (DOM + inline styles only, no scripts/event hand
 ```
 
 Each pack stops applying entirely — panel spacing returns to its own values, shell rows return to the shell's sizes. This is checked by the harness, not asserted in prose.
+
+**Careful on 0.8.1:** the host's own panel floor uses the same attribute as its gate (`:not([data-dsh-adapt="off"])` in `lib/mobile-layout.js:507`), so `off` **also disables the host floor** — the result can be worse than having no pack at all (measured in t12: Context Insights min 44 → 19.8px, `<44` 0 → 115). To disable a pack but keep the host floor, uninstall/disable the extension instead of setting this attribute.
 
 ## What has been verified
 

@@ -83,6 +83,9 @@ pack 不引用）。
 （`mobile.css` 用 `:root:not([data-dsh-adapt="off"])` 守卫），面板回到插件自己的尺寸。
 `check-pack` 的 opt-out 轮已验证：按钮 44→28、输入 44→22、面板盒回基线。
 
+**0.8.1 起注意**：宿主自己的面板地板也以 `data-dsh-adapt="off"` 为门阀（`lib/mobile-layout.js:507`），所以 `off` 会**连宿主地板一起关**，结果可能比「不装包」更差（t12 实测：Context Insights min 44→19.8、<44 0→115）。只关本包请卸载/停用扩展，不要用这个属性。
+
+
 ## 5. 验证
 
 ```bash

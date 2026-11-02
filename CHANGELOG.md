@@ -5,6 +5,12 @@
 
 ## [Unreleased]
 
+### Fixed（2026-11-02，t20 复核修复 3）
+
+- `shell-chrome`：侧栏按钮的 `min-width` 补齐（t15 F1）——折叠轨道 icon、drawerToggle（28×28/36×36）在两种抽屉状态下都到 44×44；`check-pack` 的 `runtime.shell.rail` 改为宽高都断言，新增 `runtime.shell.drawerToggle`，`runtime.shell.dockedRows` 也检查宽度；红色回归「只设 height 必须 FAIL」。
+- `docs/复核修复3-20261102.md`：BUG-02 逐类计数（41/94 全是 `button[role=switch]` 36×20）与定向透明命中层试验（核心开关可行、第三方伪元素旋钮会被覆盖）→ 不新增通配规则，保持「我们的空白」口径。
+- 文档：模板 README / shell-chrome CSS 头的 opt-out 措辞统一为「本包与宿主地板一起关」；catalog 恢复「未来宿主行高 >44 会被 !important 压小」风险；`verifiedWith` 改为 0.8.1；补 `role="treeitem"` 的 file:line。
+
 ### Changed（2026-11-02，t10 加固）
 
 - `check-pack` 的 host-probe 改为**全量控件**断言（reviewer F1）：sentinel 阶段逐个比较 `controls` 的 computed `min-height` 与无包基线、逐个断言不小于基线；注入 0.8.1 宿主地板后逐个断言受覆盖控件 ≥44px（未覆盖控件只要求不压小）。报告给出不达标数量与最小 min-height/高度。新增红色回归「只压 `[role=group] button` 必须 FAIL」。

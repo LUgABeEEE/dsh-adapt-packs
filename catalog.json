@@ -29,7 +29,7 @@
       "verifiedWith": {
         "dshMobile": "0.8.0",
         "dsh": "0.2.1-rc.2",
-        "dshMobileMain": "post-#319 (6c50b13, unreleased)"
+        "dshMobileMain": "0.8.1 (released 2026-11-01)"
       },
       "evidence": {
         "level": "runtime-0.8.0",
@@ -43,7 +43,8 @@
         "missing": [
           "含 #319 的发布版（0.8.1，2026-11-01 已发布）上的真实运行时：门阀退让后的数值只在 check-pack 的 host-probe 合成状态下验证过（注入的正是 0.8.1 `lib:504-513` 规则）；本机已升级 0.8.1，但尚未在真实 0.8.1 宿主上装包测量。",
           "真机验证（iOS / Android WebView，390×844 触摸）：拇指准确度、真实 env(safe-area-inset-bottom)（headless 里为 0）、软键盘弹出后的可视区。",
-          "宽表/画布类 100vw 插件根的实际溢出压力，以及 720/721/899/900 中间宽度上的数值。"
+          "宽表/画布类 100vw 插件根的实际溢出压力，以及 720/721/899/900 中间宽度上的数值。",
+          "DSH 原生插件设置页的 41/94 个 <44 控件全部是 button[role=\"switch\"] 36×20（2026-11-02 在 0.8.1 真实页 390×844 逐类计数：switch 41/41、button 53/0、link/field 其他 0）；宿主地板显式排除 role=switch（lib:507），本包不做通配透明命中层（会覆盖第三方开关伪元素），见 docs/复核修复3-20261102.md。"
         ],
         "promotion": "补齐含 #319 的发布版运行时 + 真机实测后才可升 candidate；check-pack 的 0.8.0 / 宿主自管两种状态是合成夹具，不能替代真机。",
         "verifiedWith": {
@@ -68,24 +69,29 @@
       "usesHostMarkers": [
         ".dshm-panelNav",
         ".dshm-drawer",
-        "[data-slot=\"sidebar\"]"
+        "[data-slot=\"sidebar\"]",
+        "[role=\"treeitem\"]"
       ],
       "verifiedWith": {
-        "dshMobile": "0.8.0",
-        "dsh": "0.2.1-rc.2",
-        "dshMobileMain": "post-#319 (6c50b13, unreleased)"
+        "dshMobile": "0.8.1",
+        "dsh": "0.2.1"
       },
       "evidence": {
         "level": "runtime-0.8.0",
         "have": [
-          "check-pack 22/0/4（4 skip：面板三组断言 + rail 组按 capabilities 未声明而跳过）：fixture 返回栏 25→44、抽屉行 28→44、1280×800 精指针零改动、opt-out 回落。",
-          "0.8.0 真实运行时：抽屉展开行 36→44px 有效（宿主不给侧栏行下限）；返回栏宿主已是 48px（lib/mobile-layout.js:449 `.dshm-panelBack{min-width:48px;min-height:48px}`），旧规则 `44px !important` 会把它压成 48→44、panelNav 57→56（负收益）。现改为特异性 0 且非 !important 的 rise-only：宿主写了 min-height 时宿主优先（48 不变），宿主只给 height 或没给时才抬到 44。",
-          "#319（main 6c50b13）只改插件面板（`[data-slot=\"main\"]` 内控件与面板根），没有动 `.dshm-panelNav` / `.dshm-drawer`，所以抽屉行规则在 main 上预期同样成立。【推断】依据 #319 merge diff，未在含 #319 的构建上实测"
+          "check-pack 25/0/4（4 skip：面板三组断言 + rail 组按 capabilities 未声明而跳过）：fixture 返回栏 25→44、展开抽屉按钮 28→44×44、折叠轨道图标 36×36→44×44、drawerToggle 28×28/36×36→44×44（两种状态，宽高都断言）、停靠会话/项目行 32→44；1280×800 精指针（含轨道/drawerToggle/停靠行）零改动；opt-out 逐项回落。",
+          "0.8.0 真实运行时（2026-10-31，390×844 粗指针）：抽屉展开行 36→44px 有效；返回栏宿主 48px，rise-only 保持 48（旧规则会压成 44）。",
+          "0.8.1 平板真机修前基线（t12，2026-11-02，1363×860 / 909×1314）：旧包装包后仍有 31 条 sessionRow 32px、21 条 projectRow 34px、15–16 个轨道图标 36px——旧规则只认 [data-open=\"true\"]，停靠/折叠态没覆盖（测试-适配矩阵-20261102.md BUG-03）。新规则按 role=\"treeitem\"（dsh-client-ui-workspace 的稳定 ARIA）与两种抽屉状态扩规则后，fixture 全部 44。",
+          "宿主 0.8.1 的 #319 地板不覆盖侧栏：选择器以 [data-slot=\"main\"] 为根（lib/mobile-layout.js:507），所以侧栏在 0.8.0/0.8.1 上都需要本包，不存在「宿主接管后退让」的门阀；这是本包与 core-panel 的关键区别。",
+          "t15 真实页注入（0.8.1，平板）：停靠 treeitem 34→44（20 条）、折叠轨道 icon 36×36→36×44、opt-out 回落 34/36——这是修前/修中证据；本轮再补轨道 min-width（44×44），fixture 断言通过，真机整机复测仍未做。",
+          "t17 真机复测（0.8.1 平板，2026-11-02 14:07 包）：treeitem 会话/项目行 32/34→44（已修好）；折叠轨道 icon 36×36→36×44、drawerToggle 收起 28×28→28×44、展开 36×36→36×44——宽度没动（t15 F1）。本轮补 min-width:44（fixture 44×44、断言宽高都查）；整机装新包复测仍未做。"
         ],
         "missing": [
-          "含 #319 的发布版运行时未测（外壳规则未变，预期与 0.8.0 相同）。",
-          "真机验证（iOS / Android WebView）：thumb 准确度、抽屉行的视觉密度。",
-          "风险未消除项：若未来宿主把抽屉行抬到 >44px，本条的 `!important` 会把它压小（与返回栏旧问题同型）；宿主换几何时需要把这条也改成 rise-only 或退役。"
+          "修复后的最新包未在真机整机上复测：t17 的 36×44/28×44 是补宽度前的包；44×44 目前只有 check-pack 定向 fixture 证据。",
+          "折叠轨道 44×44 在 56px、overflow:hidden 的轨道里是否裁切未在真机确认；行内 rowActions 与 drawerToggle 被抬宽后的视觉密度也未复测（过挤需上游把动作按钮与行分离）。",
+          "停靠行的行内动作按钮（rowActions）被同时抬到 44，视觉是否过挤未验；若过挤需要上游把行高与动作按钮分开。",
+          "宿主未来把侧栏行做到 >44px 时，本包的 !important 会把它压小（与返回栏旧问题同型）；届时需要改成 rise-only 或退役。",
+          "真机 iOS / Android WebView 的拇指准确度、safe-area、软键盘未覆盖。"
         ],
         "promotion": "补齐含 #319 的发布版运行时 + 真机实测后才可升 candidate"
       },
@@ -123,7 +129,8 @@
         "missing": [
           "真机验证（iOS / Android WebView）：含软键盘弹出时悬浮控件的位置变化。",
           "长会话下会话态的留白：本次空会话无视觉位移（mainContent 844/844），长会话没测。",
-          "含 #319 的发布版：宿主会在面板态把主区设为可滚，本包的 overflow-y:auto 与它同值（不冲突），但未在真实宿主上复测。"
+          "含 #319 的发布版：宿主会在面板态把主区设为可滚，本包的 overflow-y:auto 与它同值（不冲突），但未在真实宿主上复测。",
+          "不解决浮动控件自身的点击遮挡：t12 实测 img.dshwv-img（143×143、pe=auto）会直接吞掉 elementFromPoint；本包只写让位高度，点击需上游改浮动控件的 pointer-events/布局盒。"
         ],
         "promotion": "补齐真机 + 含 #319 发布版实测后才可升 candidate"
       },

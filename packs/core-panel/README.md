@@ -44,6 +44,9 @@ opt-out 是**面板级**开关：只要主槽 `[data-slot="main"]` 的**子树**
 
 opt-out 可以在页面生命周期里切换，`data-dsh-adapt` 的属性变化也在 observer 范围内。
 
+**0.8.1 起注意**：宿主自己的面板地板也以 `data-dsh-adapt="off"` 为门阀（`lib/mobile-layout.js:507`），所以 `off` 会**连宿主地板一起关**，结果可能比「不装包」更差（t12 实测：Context Insights min 44→19.8、<44 0→115）。只关本包请卸载/停用扩展，不要用这个属性。
+
+
 **注意**：本包的 CSS 与 shim 是同一个状态开关。只加载 `mobile.css` 而没有 `mobile.js` 时，`data-dshm-adapt-panel` 永远不会被写上，规则整体不生效（这是刻意的：没有状态就没有适配）。宿主自己写 `data-dsh-panel` 时，本包的高度地板/宽度回收本来就会退让。
 
 **升级注意**：0.1.0 的旧 shim 也写宿主的 `data-dsh-panel`。升级时必须 CSS 与 JS 一起换（扩展是整目录替换，正常 `install`/覆盖不会出现半套）；如果只换了 `mobile.css`、旧 shim 还在写 `data-dsh-panel`，新 CSS 会把它误当「宿主已接管」而退让。用 `--inject` 在**已装旧扩展**的页面上试新包时也会撞到这个现象。

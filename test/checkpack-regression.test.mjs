@@ -25,6 +25,7 @@ const REPO = resolve(HERE, '..')
 const EXAMPLE = join(REPO, 'docs', 'examples', 'fixture-pack')
 const CHECKER = join(REPO, 'tools', 'check-pack.mjs')
 const CONTEXT_PACK = join(REPO, 'packs', 'dsh-context-mobile')
+const SHELL_PACK = join(REPO, 'packs', 'shell-chrome')
 const REQUIRE_BROWSER = process.env.CHECKPACK_REGRESSION_REQUIRE_BROWSER === '1'
 const RUN_TIMEOUT_MS = 180_000
 
@@ -201,5 +202,76 @@ test('host gate: crushing only [role=group] buttons still fails host-floor-kept'
     assert.equal(assertion.status, 'failed', `expected the crushed group buttons to fail host-floor-kept, got ${assertion.status}: ${assertion.message}`)
     assert.match(assertion.message, /20px/, `the failure should name the crushed height: ${assertion.message}`)
     assert.match(assertion.message, /4 个不达标/, `the failure should count every crushed control: ${assertion.message}`)
+  })
+})
+
+/**
+ * Copy a real pack under its basename, let `patch` rewrite mobile.css, run the checker.
+ * Used by the shell-chrome regressions (the docked-row rule must not depend on
+ * `data-open`, so re-scoping it to a state that never happens has to fail the probe).
+ */
+function withPatchedPack(sourceDir, patch, fn) {
+  const root = mkdtempSync(join(tmpdir(), 'checkpack-shell-'))
+  const packDir = join(root, basename(sourceDir))
+  try {
+    cpSync(sourceDir, packDir, { recursive: true })
+    const cssPath = join(packDir, 'mobile.css')
+    const source = readFileSync(cssPath, 'utf8')
+    const patched = patch(source)
+    assert.notEqual(patched, source, 'pack mutation did not change mobile.css')
+    writeFileSync(cssPath, patched)
+    return fn(packDir)
+  } finally {
+    rmSync(root, { recursive: true, force: true })
+  }
+}
+
+// Reviewer BUG-03 (t12): the docked sidebar rows (`role="treeitem"`, 32/34px) were only
+// reached when `[data-open="true"]`. A rule that keeps that filter must fail, otherwise
+// the tablet docked layout silently stays below 44px.
+test('shell chrome: a docked sidebar rule gated on data-open fails runtime.shell.dockedRows', { skip, timeout: RUN_TIMEOUT_MS }, () => {
+  withPatchedPack(SHELL_PACK, source => {
+    assert.ok(source.includes(':not([data-dsh-adapt="off"]) .dshm-drawer [data-slot="sidebar"] [role="treeitem"]'))
+    return source.replace(
+      ':not([data-dsh-adapt="off"]) .dshm-drawer [data-slot="sidebar"] [role="treeitem"]',
+      ':not([data-dsh-adapt="off"]) .dshm-drawer[data-open="never"] [data-slot="sidebar"] [role="treeitem"]',
+    )
+  }, packDir => {
+    const result = runChecker(packDir)
+    assert.equal(result.status, 1, `check-pack should exit 1 when docked rows stay below the floor\nstdout: ${result.stdout?.slice(0, 2000)}\nstderr: ${result.stderr?.slice(0, 2000)}`)
+    assert.notEqual(result.payload, null, 'check-pack --json output was not JSON (is Playwright/Chromium available?)')
+    assert.equal(result.payload.ok, false, 'check-pack --json should report ok=false')
+    const pack = result.payload.packs.find(item => item.id === 'shell-chrome')
+    assert.ok(pack, 'shell-chrome missing from the --json report')
+    const assertion = pack.assertions.find(item => item.id === 'runtime.shell.dockedRows')
+    assert.ok(assertion, 'runtime.shell.dockedRows missing from the report')
+    assert.equal(assertion.status, 'failed', `expected the data-open-gated rule to fail dockedRows, got ${assertion.status}: ${assertion.message}`)
+    assert.match(assertion.message, /32px/, `the failure should name the unraised row height: ${assertion.message}`)
+  })
+})
+
+// Reviewer F1 (t15): the rail rule used to lift height only (36×36 → 36×44). Width is
+// part of the 44px target, so the rail assertion now checks both edges; a rule that
+// drops min-width must fail.
+test('shell chrome: a height-only rail rule fails runtime.shell.rail', { skip, timeout: RUN_TIMEOUT_MS }, () => {
+  withPatchedPack(SHELL_PACK, source => {
+    assert.ok(source.includes('min-width: 44px !important;'))
+    // Drop the width floor while keeping the height floor: rail (36x36) and
+    // drawerToggle (28x28 / 36x36) must then fail their width assertions.
+    return source.replace('min-width: 44px !important;', 'min-width: 36px !important;')
+  }, packDir => {
+    const result = runChecker(packDir)
+    assert.equal(result.status, 1, `check-pack should exit 1 when rail width stays below 44px\nstdout: ${result.stdout?.slice(0, 2000)}\nstderr: ${result.stderr?.slice(0, 2000)}`)
+    assert.notEqual(result.payload, null, 'check-pack --json output was not JSON (is Playwright/Chromium available?)')
+    assert.equal(result.payload.ok, false, 'check-pack --json should report ok=false')
+    const pack = result.payload.packs.find(item => item.id === 'shell-chrome')
+    assert.ok(pack, 'shell-chrome missing from the --json report')
+    const assertion = pack.assertions.find(item => item.id === 'runtime.shell.rail')
+    assert.ok(assertion, 'runtime.shell.rail missing from the report')
+    assert.equal(assertion.status, 'failed', `expected the height-only rail rule to fail, got ${assertion.status}: ${assertion.message}`)
+    assert.match(assertion.message, /36×44/, `the failure should name both edges: ${assertion.message}`)
+    const toggle = pack.assertions.find(item => item.id === 'runtime.shell.drawerToggle')
+    assert.ok(toggle, 'runtime.shell.drawerToggle missing from the report')
+    assert.equal(toggle.status, 'failed', `expected the height-only rule to fail the toggle width too, got ${toggle.status}: ${toggle.message}`)
   })
 })

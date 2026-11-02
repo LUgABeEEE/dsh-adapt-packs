@@ -6,8 +6,13 @@
  * 两条规则的强度不一样，这是 2026-10-31 的 0.8.0 实测结论（见 README 与
  * 实测-0.8.0-20261031.md）：
  *
- *   1. 抽屉行（展开态）36px → 44px：仍然有效。宿主 0.8.0 没有给侧栏行触控下限，
- *      所以这条用 `!important`（宿主下限的语义，见 README「代价」）。
+ *   1. 侧栏（抽屉的两种状态都要管）：
+ *      - 展开/停靠态：会话行、项目行是 `role="treeitem"` 的 div（32/34px），
+ *        行内按钮 28–36px；
+ *      - 折叠态：56px 图标轨里的按钮 36px。
+ *      宿主 0.8.1 的 #319 地板只覆盖 `[data-slot="main"]`（`lib/mobile-layout.js:507`），
+ *      **不覆盖侧栏**，所以两种状态都要本包补，且不能只认 `[data-open="true"]`。
+ *      这条用 `!important`（宿主下限的语义，见 README「代价」）。
  *
  *   2. 返回栏按钮：0.8.0 的 `.dshm-panelBack` 已经是 `min-width/min-height:48px`
  *      （dsh-mobile 0.8.0 lib/mobile-layout.js:449）。原先那条 `44px !important`
@@ -21,7 +26,9 @@
  *
  * 只抬命中区，不改视觉：这里没有配色、没有间距重排，只加 min-height / min-width。
  *
- * opt-out：外壳级开关写在文档根上（`<html data-dsh-adapt="off">`），整页回到原尺寸。
+ * opt-out：外壳级开关写在文档根上（`<html data-dsh-adapt="off">`）。注意它同时是宿主 0.8.1
+ * 移动地板的门阀（`lib/mobile-layout.js:507`），所以是「本包与宿主地板一起关」，不是恢复官方原状；
+ * 只关本包请停用扩展（见 README opt-out）。
  * 面板级的那种「只有某个插件面板例外」不适用于这里 —— 它管的就是外壳本身。
  */
 
@@ -34,15 +41,29 @@
     min-width: 44px;
   }
 
-  /* 2. 抽屉展开时是拇指面，不是悬停轨道。折叠态（56px 图标轨）不动 ——
-   *    那时候它是一个 rail，不是可点的行。 */
-  :root:not([data-dsh-adapt="off"]) .dshm-drawer[data-open="true"] [data-slot="sidebar"] :where(button, [role="button"], a) {
+  /* 2. 侧栏里的按钮：高度与宽度都抬到 44（t12/t15/t17）。
+   *    不按 `data-open` 过滤——停靠（平板）与折叠（轨道）是两种真实状态，
+   *    只认展开态会让停靠/轨道两处继续停在 32–36px（t12 BUG-03）。
+   *    宽度用 min-width，只会抬高、不会压小：展开态的行式按钮本来就是 280/312/320px，
+   *    不受影响；真正变宽的是折叠轨道 icon（36×36）、drawerToggle（收起 28×28 / 展开 36×36）
+   *    与行内动作按钮——这些正是 t17 实测仍缺宽度的那批。
+   *    56px 轨道放得下 44px（每侧余 6px）。 */
+  :root:not([data-dsh-adapt="off"]) .dshm-drawer [data-slot="sidebar"] :where(button, [role="button"], a) {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+
+  /* 3. 停靠/展开态的会话行、项目行是 `role="treeitem"` 的 div（宿主 dsh-client-ui-workspace
+   *    的稳定 ARIA 契约，`lib/client.js:1969`（ProjectRowItem）/`:2185`（SearchResultItem）/
+   *    `:2278`（SessionNodeItem）；2026-11-02 在 0.8.1 的真实页上量到 32/34px）——
+   *    它们不是 button，所以上面那条覆盖不到。 */
+  :root:not([data-dsh-adapt="off"]) .dshm-drawer [data-slot="sidebar"] [role="treeitem"] {
     min-height: 44px !important;
   }
 
   /* 行内 a 元素在抽屉里常被当作整行点击目标；给它同样的竖直下限，
    * 但不加 min-width（长标题会自己撑开，不需要方形）。 */
-  :root:not([data-dsh-adapt="off"]) .dshm-drawer[data-open="true"] [data-slot="sidebar"] a {
+  :root:not([data-dsh-adapt="off"]) .dshm-drawer [data-slot="sidebar"] a {
     display: flex;
     align-items: center;
   }

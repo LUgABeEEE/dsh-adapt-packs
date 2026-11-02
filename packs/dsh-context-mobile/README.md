@@ -10,7 +10,7 @@
 - **面板根**：真实页面上是 **`SECTION.lc-ov-page`**（2026-11-02 verifier 在 0.8.1 + dsh-context 0.79.0 的 live DOM 上复核）；dsh-context 0.79.0 **没有** `data-dsh-*` 根标记。
 - **实测环境**：`check-pack` 定向 fixture（390×844 粗指针、1280×800 精指针零回归）。**没有在真实专用页/真机上装包实测**。
 - **风险 / 状态**：`safe` / `experimental`。纯 CSS + 一个只写自有标记的 shim；不改插件 DOM、不写宿主属性。
-- **opt-out**：`<html data-dsh-adapt="off">` 或面板根/主槽子树带 `data-dsh-adapt="off"`，全部规则失效。
+- **opt-out**：`<html data-dsh-adapt="off">` 或面板根/主槽子树带 `data-dsh-adapt="off"`，全部规则失效。注意：0.8.1 起这个属性同时也是宿主地板的门阀（`lib:507`），`off` 会连宿主地板一起关，结果可能比不装包更差；只关本包请停用扩展。
 - **回滚**：删掉 `$DSH_HOME/mobile-access/extensions/dsh-context-mobile/`（约 2s 生效）；本包不改任何已安装文件。
 
 ## 0. 证据分级（2026-11-02 复核后重写）

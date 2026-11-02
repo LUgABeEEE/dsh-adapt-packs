@@ -13,7 +13,7 @@
   面板自有标记（本包点名的全部）：`[data-dsh-hsp-root]` `-head` `-beat` `-overview` `-ov`
   `-ov-value` `-ov-sub` `-signal` `-signal-text` `-card` `-kv` `-kv-value`。
   这些是 0.7.5 起对外承诺的稳定标记，**不依赖 `hsp-*` 私有类名**。
-- **opt-out**：`<html data-dsh-adapt="off">` 时全部规则失效；面板回到自己的尺寸。
+- **opt-out**：`<html data-dsh-adapt="off">` 时全部规则失效；面板回到自己的尺寸。注意：0.8.1 起该属性同时是宿主地板的门阀（`lib:507`），会连宿主地板一起关；只关本包请停用扩展。
 - **回滚**：删掉 `$DSH_HOME/mobile-access/extensions/host-service-panel-mobile/`（约 2s 生效）。本包不改任何已安装文件。
 - **状态 / 风险 / 默认值**：见仓库根 `catalog.json`，不写进 `extension.json`。
 
