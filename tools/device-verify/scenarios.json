@@ -1,0 +1,32 @@
+{
+  "$comment": "Default device-verify configuration. `run.mjs overlay on` embeds this into the injected mobile.js as window.__dvConfig; override with --config <file> or --scenarios <name,name>.",
+  "version": 1,
+  "autoStart": true,
+  "startDelayMs": 2500,
+  "pollIntervalMs": 120,
+  "timeoutMs": 15000,
+  "closeTimeoutMs": 1200,
+  "allowHistoryBack": true,
+  "settlePolls": 3,
+  "settleWindowMs": 2000,
+  "hitCheckLimit": 200,
+  "titleMaxChars": 20000,
+  "maxStates": 40,
+  "keyboardProbe": true,
+  "keyboardThreshold": 80,
+  "maxViewportEvents": 40,
+  "exportLogcat": true,
+  "keyboardProbeSelectors": [
+    "[data-slot=\"main\"] textarea",
+    "[data-slot=\"main\"] input[type=\"text\"]",
+    "[data-slot=\"main\"] [contenteditable=\"true\"]"
+  ],
+  "hideDuringMeasure": true,
+  "sinkUrl": "http://127.0.0.1:8799/report",
+  "scenarios": [
+    { "name": "context-insights", "panel": "context-insights", "labels": ["上下文洞察", "Context Insights"] },
+    { "name": "todos", "panel": "todos", "labels": ["待办", "Todos"] },
+    { "name": "plugins", "panel": "plugins", "labels": ["插件", "Plugins"] },
+    { "name": "memory", "panel": "memory", "labels": ["记忆系统", "记忆", "Memory", "Memory system"], "optional": true }
+  ]
+}
