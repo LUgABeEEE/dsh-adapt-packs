@@ -1,0 +1,49 @@
+/* tablet-wide · 宽屏内容居中定宽 + composer 胶囊（实验，不是 catalog 包）
+ *
+ * 设计对照：dsh-go 的平板/横屏重排（侧栏常驻、内容居中、composer 居中胶囊）。
+ * 只借鉴**设计意图**；没有复制 dsh-go 的代码、类名、样式表或素材（AGPL/品牌保留）。
+ *
+ * 生效范围（三重门，缺一不可）：
+ *   1. `mobile-dedicated`：所有选择器都挂在 `.dshm-shell` 之下——stock DSH web、
+ *      粗指针桌面 ≥1100px 没有这个宿主外壳，规则不会命中；
+ *   2. `≥1100px` 且粗指针：与「宽主区」对齐。竖屏 909 主区只有 569，收益可忽略，
+ *      所以不再进入；桌面（精指针）也不进入；
+ *   3. `data-dsh-adapt="off"` 可整体回落。
+ *
+ * 尺寸：
+ *   - 会话列 `max-width:720px` 居中（与 composer 同宽，视觉更整）；
+ *   - composer `max-width:720px`，同时把 `--dsh-composer-side-clearance` 归零，
+ *     让胶囊贴齐列宽（否则列内 16px×2 的留白会把胶囊压到 ~683）；
+ *   - 归零 clearance 同时把会话列左右 padding 从 32px 降到 16px，宿主正文
+ *     `--dsh-chat-content-width`（680）仍能完整放下（720−32=688 ≥ 680）。
+ *
+ * 为什么同时写 `width:100%`：`[data-conversation-scroll]` 是 flex 列里的
+ * `flex:1` 子项（`.wSkVaW_scrollBody`），只给 `max-width` + `margin-inline:auto`
+ * 会让 auto 宽度收缩成 fit-content（实测 720 会变成 ~396）；`width:100%` 才能得到
+ * 「最多 720、其余居中」。
+ *
+ * 正文宽度：宿主已经把消息正文限制在约 680px（`--dsh-chat-content-width`），
+ * 本实验**不改变**正文宽度，只改会话列 / 滚动条位置 / 两侧留白与 composer 胶囊。
+ * 若要把正文也拉到 720，需要改宿主变量并复测，不在本实验范围。
+ *
+ * opt-out 与宿主门阀：`data-dsh-adapt="off"` 同时是宿主 0.8.1 面板地板的门阀
+ * （`lib/mobile-layout.js:507`）。所以加它是「本实验与宿主地板一起关」，
+ * 不是恢复官方原状；只关本实验请停用扩展。
+ */
+
+@media (min-width: 1100px) and (pointer: coarse) {
+  :root:not([data-dsh-adapt="off"]) .dshm-shell [data-conversation-scroll] {
+    /* 列与胶囊同宽：清掉 composer 的左右 clearance（也把会话列 padding 从 32 降到 16）。
+       必须设在 scroll 容器上：宿主把变量定义在更内层的 .wSkVaW_body，设在 .dshm-shell 会被覆盖。 */
+    --dsh-composer-side-clearance: 0px;
+    width: 100%;
+    max-width: 720px;
+    margin-inline: auto;
+  }
+
+  :root:not([data-dsh-adapt="off"]) .dshm-shell [data-composer-card] {
+    width: 100%;
+    max-width: 720px;
+    margin-inline: auto;
+  }
+}

@@ -187,6 +187,17 @@ Each pack stops applying entirely — panel spacing returns to its own values, s
 
 That is why the packs stay `experimental` rather than `candidate`. Measuring is a separate problem, and there is a tool for it: [`dsh-ui-lab`](https://github.com/LUgABeEEE/dsh-ui-lab) opens a DSH surface at real device proportions, captures a panel, and gates a matrix run on a pixel diff.
 
+## Experiments
+
+[`experiments/`](experiments/) holds adaptations that do **not** fit the pack contract (the
+capability table or `check-pack`'s assertion groups) and are therefore not in `catalog.json`.
+They are opt-in, default off, and carry their own lab evidence.
+
+- [`experiments/tablet-wide/`](experiments/tablet-wide/): a wide-screen experiment borrowing
+  dsh-go's *design* (persistent sidebar, centred content column, floating composer pill) —
+  720px conversation column + 720px composer at `≥1100px` on a coarse pointer, hard-guarded by
+  `.dshm-shell` (mobile-dedicated only); no dsh-go code or assets are copied.
+
 ## The dependency this cannot escape
 
 These packs name dsh-mobile's own class names — `.dshm-shell`, `.dshm-main`, `.dshm-mainContent`, `.dshm-drawer`, `.dshm-panelNav`, `[data-slot="sidebar"]`. dsh-mobile does not promise to keep them, and its documentation explicitly rules out maintaining a general override table keyed on third-party class names. `catalog.json` lists the markers each pack touches (the `usesHostMarkers` field) precisely so a break is traceable to a pack, but a redesign can still break them.

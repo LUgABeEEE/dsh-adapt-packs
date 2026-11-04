@@ -1,0 +1,605 @@
+{
+  "hostOverlay": {
+    "file": "/data/agent/.dsh/mobile-access/mobile.js",
+    "exists": false,
+    "blocked": false
+  },
+  "nonDedicated": {
+    "applied": false,
+    "before": {
+      "scroll": {
+        "x": 0,
+        "y": 0,
+        "w": 1023,
+        "h": 700
+      },
+      "card": {
+        "x": 0,
+        "y": 700,
+        "w": 712,
+        "h": 98
+      }
+    },
+    "after": {
+      "scroll": {
+        "x": 0,
+        "y": 0,
+        "w": 1023,
+        "h": 700
+      },
+      "card": {
+        "x": 0,
+        "y": 700,
+        "w": 712,
+        "h": 98
+      }
+    }
+  },
+  "results": [
+    {
+      "scenario": "1363x860",
+      "session": {
+        "key": "session:session-3d39c8d5-dd19-479a-b447-51abb0a30199",
+        "label": "2 subagents runningUI优化与社区维护协作8min",
+        "turns": 107
+      },
+      "before": {
+        "viewport": {
+          "w": 1363,
+          "h": 860,
+          "coarse": true
+        },
+        "wideMedia": true,
+        "drawer": {
+          "x": 0,
+          "y": 0,
+          "w": 340,
+          "h": 860
+        },
+        "scroll": {
+          "x": 340,
+          "y": 76,
+          "w": 1021,
+          "h": 784
+        },
+        "seat": {
+          "x": 340,
+          "y": 731,
+          "w": 1016,
+          "h": 129
+        },
+        "stack": {
+          "x": 340,
+          "y": 731,
+          "w": 1016,
+          "h": 129
+        },
+        "card": {
+          "x": 492,
+          "y": 731,
+          "w": 712,
+          "h": 98
+        },
+        "turnCount": 107,
+        "firstTurn": {
+          "x": 508,
+          "y": -9820,
+          "w": 680,
+          "h": 80
+        },
+        "overflow": false
+      },
+      "after": {
+        "viewport": {
+          "w": 1363,
+          "h": 860,
+          "coarse": true
+        },
+        "wideMedia": true,
+        "drawer": {
+          "x": 0,
+          "y": 0,
+          "w": 340,
+          "h": 860
+        },
+        "scroll": {
+          "x": 491.5,
+          "y": 76,
+          "w": 720,
+          "h": 784
+        },
+        "seat": {
+          "x": 491.5,
+          "y": 731,
+          "w": 715,
+          "h": 129
+        },
+        "stack": {
+          "x": 491.5,
+          "y": 731,
+          "w": 715,
+          "h": 129
+        },
+        "card": {
+          "x": 491.5,
+          "y": 731,
+          "w": 715,
+          "h": 98
+        },
+        "turnCount": 107,
+        "firstTurn": {
+          "x": 509,
+          "y": -9889,
+          "w": 680,
+          "h": 80
+        },
+        "overflow": false
+      },
+      "optedOut": {
+        "viewport": {
+          "w": 1363,
+          "h": 860,
+          "coarse": true
+        },
+        "wideMedia": true,
+        "drawer": {
+          "x": 0,
+          "y": 0,
+          "w": 340,
+          "h": 860
+        },
+        "scroll": {
+          "x": 340,
+          "y": 76,
+          "w": 1021,
+          "h": 784
+        },
+        "seat": {
+          "x": 340,
+          "y": 731,
+          "w": 1016,
+          "h": 129
+        },
+        "stack": {
+          "x": 340,
+          "y": 731,
+          "w": 1016,
+          "h": 129
+        },
+        "card": {
+          "x": 492,
+          "y": 731,
+          "w": 712,
+          "h": 98
+        },
+        "turnCount": 107,
+        "firstTurn": {
+          "x": 508,
+          "y": -9820,
+          "w": 680,
+          "h": 80
+        },
+        "overflow": false
+      }
+    },
+    {
+      "scenario": "909x1314",
+      "session": {
+        "key": "session:session-3d39c8d5-dd19-479a-b447-51abb0a30199",
+        "label": "2 subagents runningUI优化与社区维护协作8min",
+        "turns": 107
+      },
+      "before": {
+        "viewport": {
+          "w": 909,
+          "h": 1314,
+          "coarse": true
+        },
+        "wideMedia": false,
+        "drawer": {
+          "x": 0,
+          "y": 0,
+          "w": 340,
+          "h": 1314
+        },
+        "scroll": {
+          "x": 340,
+          "y": 82,
+          "w": 567,
+          "h": 1232
+        },
+        "seat": {
+          "x": 340,
+          "y": 1172,
+          "w": 562,
+          "h": 142
+        },
+        "stack": {
+          "x": 340,
+          "y": 1172,
+          "w": 562,
+          "h": 142
+        },
+        "card": {
+          "x": 356,
+          "y": 1172,
+          "w": 530,
+          "h": 98
+        },
+        "turnCount": 107,
+        "firstTurn": {
+          "x": 372,
+          "y": -11094,
+          "w": 498,
+          "h": 80
+        },
+        "overflow": false
+      },
+      "after": {
+        "viewport": {
+          "w": 909,
+          "h": 1314,
+          "coarse": true
+        },
+        "wideMedia": false,
+        "drawer": {
+          "x": 0,
+          "y": 0,
+          "w": 340,
+          "h": 1314
+        },
+        "scroll": {
+          "x": 340,
+          "y": 82,
+          "w": 567,
+          "h": 1232
+        },
+        "seat": {
+          "x": 340,
+          "y": 1172,
+          "w": 562,
+          "h": 142
+        },
+        "stack": {
+          "x": 340,
+          "y": 1172,
+          "w": 562,
+          "h": 142
+        },
+        "card": {
+          "x": 356,
+          "y": 1172,
+          "w": 530,
+          "h": 98
+        },
+        "turnCount": 107,
+        "firstTurn": {
+          "x": 372,
+          "y": -11094,
+          "w": 498,
+          "h": 80
+        },
+        "overflow": false
+      },
+      "optedOut": {
+        "viewport": {
+          "w": 909,
+          "h": 1314,
+          "coarse": true
+        },
+        "wideMedia": false,
+        "drawer": {
+          "x": 0,
+          "y": 0,
+          "w": 340,
+          "h": 1314
+        },
+        "scroll": {
+          "x": 340,
+          "y": 82,
+          "w": 567,
+          "h": 1232
+        },
+        "seat": {
+          "x": 340,
+          "y": 1172,
+          "w": 562,
+          "h": 142
+        },
+        "stack": {
+          "x": 340,
+          "y": 1172,
+          "w": 562,
+          "h": 142
+        },
+        "card": {
+          "x": 356,
+          "y": 1172,
+          "w": 530,
+          "h": 98
+        },
+        "turnCount": 107,
+        "firstTurn": {
+          "x": 372,
+          "y": -11094,
+          "w": 498,
+          "h": 80
+        },
+        "overflow": false
+      }
+    },
+    {
+      "scenario": "834x1194-below-1100",
+      "session": null,
+      "before": {
+        "viewport": {
+          "w": 834,
+          "h": 1194,
+          "coarse": true
+        },
+        "wideMedia": false,
+        "drawer": {
+          "x": 0,
+          "y": 0,
+          "w": 56,
+          "h": 1194
+        },
+        "scroll": {
+          "x": 56,
+          "y": 40,
+          "w": 776,
+          "h": 1154
+        },
+        "seat": {
+          "x": 56,
+          "y": 498,
+          "w": 771,
+          "h": 238
+        },
+        "stack": {
+          "x": 69.5,
+          "y": 498,
+          "w": 744,
+          "h": 238
+        },
+        "card": {
+          "x": 85.5,
+          "y": 590,
+          "w": 712,
+          "h": 114
+        },
+        "turnCount": 0,
+        "firstTurn": null,
+        "overflow": false
+      },
+      "after": {
+        "viewport": {
+          "w": 834,
+          "h": 1194,
+          "coarse": true
+        },
+        "wideMedia": false,
+        "drawer": {
+          "x": 0,
+          "y": 0,
+          "w": 56,
+          "h": 1194
+        },
+        "scroll": {
+          "x": 56,
+          "y": 40,
+          "w": 776,
+          "h": 1154
+        },
+        "seat": {
+          "x": 56,
+          "y": 498,
+          "w": 771,
+          "h": 238
+        },
+        "stack": {
+          "x": 69.5,
+          "y": 498,
+          "w": 744,
+          "h": 238
+        },
+        "card": {
+          "x": 85.5,
+          "y": 590,
+          "w": 712,
+          "h": 114
+        },
+        "turnCount": 0,
+        "firstTurn": null,
+        "overflow": false
+      },
+      "optedOut": {
+        "viewport": {
+          "w": 834,
+          "h": 1194,
+          "coarse": true
+        },
+        "wideMedia": false,
+        "drawer": {
+          "x": 0,
+          "y": 0,
+          "w": 56,
+          "h": 1194
+        },
+        "scroll": {
+          "x": 56,
+          "y": 40,
+          "w": 776,
+          "h": 1154
+        },
+        "seat": {
+          "x": 56,
+          "y": 498,
+          "w": 771,
+          "h": 238
+        },
+        "stack": {
+          "x": 69.5,
+          "y": 498,
+          "w": 744,
+          "h": 238
+        },
+        "card": {
+          "x": 85.5,
+          "y": 590,
+          "w": 712,
+          "h": 114
+        },
+        "turnCount": 0,
+        "firstTurn": null,
+        "overflow": false
+      }
+    },
+    {
+      "scenario": "1280x800-fine",
+      "session": {
+        "key": "session:session-3d39c8d5-dd19-479a-b447-51abb0a30199",
+        "label": "2 subagents runningUI优化与社区维护协作8min",
+        "turns": 107
+      },
+      "before": {
+        "viewport": {
+          "w": 1280,
+          "h": 800,
+          "coarse": false
+        },
+        "wideMedia": false,
+        "drawer": {
+          "x": 0,
+          "y": 0,
+          "w": 340,
+          "h": 800
+        },
+        "scroll": {
+          "x": 340,
+          "y": 76,
+          "w": 938,
+          "h": 724
+        },
+        "seat": {
+          "x": 340,
+          "y": 671,
+          "w": 933,
+          "h": 129
+        },
+        "stack": {
+          "x": 340,
+          "y": 671,
+          "w": 933,
+          "h": 129
+        },
+        "card": {
+          "x": 450.5,
+          "y": 671,
+          "w": 712,
+          "h": 98
+        },
+        "turnCount": 107,
+        "firstTurn": {
+          "x": 466.5,
+          "y": -9880,
+          "w": 680,
+          "h": 80
+        },
+        "overflow": false
+      },
+      "after": {
+        "viewport": {
+          "w": 1280,
+          "h": 800,
+          "coarse": false
+        },
+        "wideMedia": false,
+        "drawer": {
+          "x": 0,
+          "y": 0,
+          "w": 340,
+          "h": 800
+        },
+        "scroll": {
+          "x": 340,
+          "y": 76,
+          "w": 938,
+          "h": 724
+        },
+        "seat": {
+          "x": 340,
+          "y": 671,
+          "w": 933,
+          "h": 129
+        },
+        "stack": {
+          "x": 340,
+          "y": 671,
+          "w": 933,
+          "h": 129
+        },
+        "card": {
+          "x": 450.5,
+          "y": 671,
+          "w": 712,
+          "h": 98
+        },
+        "turnCount": 107,
+        "firstTurn": {
+          "x": 466.5,
+          "y": -9880,
+          "w": 680,
+          "h": 80
+        },
+        "overflow": false
+      },
+      "optedOut": {
+        "viewport": {
+          "w": 1280,
+          "h": 800,
+          "coarse": false
+        },
+        "wideMedia": false,
+        "drawer": {
+          "x": 0,
+          "y": 0,
+          "w": 340,
+          "h": 800
+        },
+        "scroll": {
+          "x": 340,
+          "y": 76,
+          "w": 938,
+          "h": 724
+        },
+        "seat": {
+          "x": 340,
+          "y": 671,
+          "w": 933,
+          "h": 129
+        },
+        "stack": {
+          "x": 340,
+          "y": 671,
+          "w": 933,
+          "h": 129
+        },
+        "card": {
+          "x": 450.5,
+          "y": 671,
+          "w": 712,
+          "h": 98
+        },
+        "turnCount": 107,
+        "firstTurn": {
+          "x": 466.5,
+          "y": -9880,
+          "w": 680,
+          "h": 80
+        },
+        "overflow": false
+      }
+    }
+  ]
+}
